@@ -28,7 +28,7 @@ exports.getUsers = function () {
                 resolve(result.rows);
             }
         )
-    })
+     })
 
 };
 
@@ -105,7 +105,7 @@ exports.insertNewUser = async function (name, salt, password, profileId, classeI
             const test = await client.query('SELECT * FROM "projet-web".users WHERE name = $1', [name]);
 
 
-            if (test.rows.length === 1) {
+            if (test.rowCount === 1) {
                 await client.query('COMMIT');
                 return 0;
             } else {

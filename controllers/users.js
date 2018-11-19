@@ -67,13 +67,7 @@ exports.resetPasswordByAdmin = async function (req, res, next) {
     if (await session.controlSession(req.cookies.session) === 1) {
 
         if (req.body.newPassword === req.body.newPassword2) {
-            const resetPassword = await usersModels.changePassword(req.body.name, req.body.newPassword)
-            if(resetPassword === 0) {
-                res.send("Password updated. ")
-            } else {
-                res.send("Password update error. ")
-            }
-
+            await usersModels.changePassword(req.body.name, req.body.newPassword)
         } else {
             res.send("Missmatch between the two typed passwords. ")
         }

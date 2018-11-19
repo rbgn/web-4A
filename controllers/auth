@@ -28,7 +28,7 @@ exports.loginCheck = async function (id, password, res) {
             return resolve;
         }, reject => {
             res.status(501).send('Database connection error : ' + reject);
-        });
+        })
 
 
             if(dbResult.length === 1) {
