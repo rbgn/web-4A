@@ -19,4 +19,4 @@ exports.getMatiereNotes = function (promo, matiere) {
         }, reject => {
             res.status(501).send('Database connection error : ' + reject);
         });
-}
+};

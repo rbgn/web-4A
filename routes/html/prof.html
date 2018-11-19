@@ -11,131 +11,129 @@
 
 
 <body>
-    <main id="prof">
+<main id="prof">
 
-        <div class="navbar">
-            <a v-on:click="currentPage = 'myClasses'">Mes classes</a>
+    <div class="navbar">
+        <a v-on:click="currentPage = 'myClasses'">Mes classes</a>
 
-                <div class="dropdown">
-                    <button class="dropbtn"> Gérer mes notes
-                        <i class="fa fa-caret-down"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <div v-for="classe in myClasses">
-                            <a v-on:click="getNotesByMatiere(classe.classe, classe.name)"> {{ classe.name }} </a>
-                        </div>
-                    </div>
-                </div>
-
-
-            <div class="dropdown">
-                <button style="float:right" class="dropbtn">Menu
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-
-                    <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
-                    <change-password v-if="showModalPWC" @close="showModalPWC = false">
-                        <h3 slot="header">custom header</h3>
-                    </change-password>
-
-                    <a href="/users/logout">Se déconnecter</a>
-
+        <div class="dropdown">
+            <button class="dropbtn"> Gérer mes notes
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <div v-for="classe in myClasses">
+                    <a v-on:click="getNotesByMatiere(classe.classe, classe.name) ; currentPage = 'notes'">
+                        {{ classe.name }} </a>
                 </div>
             </div>
         </div>
 
-        <section v-if="currentPage === 'myClasses'" id="myClasses">
 
-            <h1> Gestion des classes</h1>
+        <div class="dropdown">
+            <button style="float:right" class="dropbtn">Menu
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
 
-            <div>
-                <table id="user_tab">
-                    <thead>
-                    <tr>
-                        <td>Nom</td>
-                        <td>Promotion</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="classe in myClasses">
-                            <td> {{ classe.name }} </td>
-                            <td> {{ classe.classe }} </td>
-                    </tbody>
-                </table>
+                <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
+                <change-password v-if="showModalPWC" @close="showModalPWC = false">
+                    <h3 slot="header">custom header</h3>
+                </change-password>
+
+                <a href="/users/logout">Se déconnecter</a>
+
             </div>
-        </section>
+        </div>
+    </div>
 
-        <section v-if="currentPage === 'notes'" id="notes">
+    <section v-if="currentPage === 'myClasses'" id="myClasses">
 
-                <h1> Notes</h1>
-            Cool
+        <h1> Gestion des classes</h1>
 
-            <div>
-                <table id="user_tab">
-                    <thead>
-                    <tr>
-                        <td>Nom</td>
-                        <td>Note</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="note in notesByMatiere">
-                        <td> {{ classe.eleve }} </td>
-                        <td> {{ classe.note }} </td>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        </section>
+        <div>
+            <table id="user_tab">
+                <thead>
+                <tr>
+                    <td>Nom</td>
+                    <td>Promotion</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="classe in myClasses">
+                    <td> {{ classe.name }}</td>
+                    <td> {{ classe.classe }}</td>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-    </main>
+    <section v-if="currentPage === 'notes'" id="notes">
 
-    <script>
-        new Vue({
-            el: '#prof',
-            data: {
-                currentPage: '',
-                showModalPWC: false,
-                myClasses: [],
-                notesByMatiere: []
+        <h1> Notes</h1>
+        Cool
+
+        <div>
+            <table id="user_tab">
+                <thead>
+                <tr>
+                    <td>Nom</td>
+                    <td>Note</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="note in notesByMatiere">
+                    <td> {{ note.eleve }}</td>
+                    <td> {{ note.note }}</td>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    </section>
+
+</main>
+
+<script>
+    new Vue({
+        el: '#prof',
+        data: {
+            currentPage: '',
+            showModalPWC: false,
+            myClasses: [],
+            notesByMatiere: []
+        },
+        created() {
+            this.getMyClasses()
+        },
+        methods: {
+            getMyClasses: function () {
+                axios
+                    .get('/prof/myclasses')
+                    .then(response => {
+                        this.myClasses = response.data
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.errored = true;
+                    })
+                    .finally(() => this.loading = false)
             },
-            created() {
-                this.getMyClasses()
+            getNotesByMatiere: function (promo, matiere) {
+                axios
+                    .post('/prof/notesbymatiere', {
+                        matiere: matiere,
+                        promo: promo
+                    })
+                    .then(response => {
+                        this.notesByMatiere = response.data;
+                        this.currentPage = 'notes';
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.errored = true;
+                    })
+                //                       .finally(() => this.currentPage = 'notes')
             },
-            methods: {
-                getMyClasses: function () {
-                    axios
-                        .get('/prof/myclasses')
-                        .then(response => {
-                            this.myClasses = response.data
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            this.errored = true;
-                        })
-                        .finally(() => this.loading = false)
-                },
-                getNotesByMatiere: function (promo, matiere) {
-                    axios
-                        .post('/prof/notesbymatiere', {
-                            matiere: matiere,
-                            promo: promo
-                        })
-                        .then(response => {
-                            this.notesByMatiere = response.data;
-
-                        })
-                        .then(cp => {
-                                this.currentPage = 'notes';
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            this.errored = true;
-                        })
- //                       .finally(() => this.currentPage = 'notes')
-                },
-            }
-        })
-    </script>
+        }
+    })
+</script>
 </body>
