@@ -1,0 +1,425 @@
+<head xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <link rel="stylesheet" type="text/css" href="stylesheets/admin.css"/>
+
+ <!--   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+
+
+
+
+</head>
+
+
+<body>
+    <main id="admin">
+
+
+        <div class="navbar">
+            <div class="dropdown">
+                <button style="float:right" class="dropbtn">Gérer les utilisateurs
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a v-on:click="currentPage = 'userList'">Lister les utilisateurs</a>
+                    <a v-on:click="currentPage = 'userAdd'">Ajouter un utilisateur</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button style="float:right" class="dropbtn">Gérer les classes
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a v-on:click="currentPage = 'classList'">Lister les classes</a>
+                    <a v-on:click="currentPage = 'classAdd'">Ajouter une classe</a>
+
+                </div>
+            </div>
+            <a v-on:click="currentPage = 'matiere'">Matières</a>
+            <div class="dropdown">
+                <button style="float:right" class="dropbtn">Menu
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">test</a>
+                    <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
+                        <modal v-if="showModalPWC" @close="showModalPWC = false">
+                            <h3 slot="header">custom header</h3>
+                        </modal>
+                    <a href="/users/logout">Se déconnecter</a>
+                </div>
+            </div>
+        </div>
+
+
+        <section v-if="currentPage === 'userAdd'" id="userAdd">
+
+            <form action="/users/new">
+                <caption>
+                    Ajout d'un nouvel utilisateur
+                </caption><br>
+                <tr>
+                    <th> Nom : </th>
+                    <td> <input type=text name="name"/> </td>
+                </tr><br>
+
+                <tr>
+                    <th> Mot de passe : </th>
+                    <td> <input type="password" name="password"/> </td>
+                </tr><br>
+
+                <tr>
+                    <th> Profil d'utilisateur : </th>
+                    <select v-model="selected" name="profile">
+                        <option v-for="profile in profiles" v-bind:value="profile.name">
+                            {{ profile.name }}
+                        </option>
+                    </select>
+                </tr><br>
+
+                <tr>
+                    <th> Classe : </th>
+                    <select v-model="selected" name="classe">
+                        <option v-for="classe in classes" v-bind:value="classe.name">
+                            {{ classe.name }}
+                        </option>
+                    </select>
+                </tr><br>
+
+                <input type="submit" formmethod="post" value="Valider"
+                       v-on:click="getUsers">
+            </form>
+
+        </section>
+
+        <section v-else-if="currentPage == 'classList'">
+
+            <h1> Liste des classes </h1>
+
+            <div class="navbar">
+                <a v-on:click="currentPage = 'userAdd'">Ajouter un utilisateur</a>
+                <a v-on:click="currentPage = 'classManage'">Gérer les classes</a>
+                <a v-on:click="currentPage = 'userManage'">Gérer les utilisateurs</a>
+                <div class="dropdown">
+                    <button style="float:right" class="dropbtn">Menu
+                        <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#">test</a>
+                        <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
+                        <modal v-if="showModalPWC" @close="showModalPWC = false">
+                            <h3 slot="header">custom header</h3>
+                        </modal>
+                        <a href="/users/logout">Se déconnecter</a>
+                    </div>
+                </div>
+            </div>
+
+ <!--           <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <td>Nom</td>
+                        <td>Renommer</td>
+                        <td>Supprimer</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="classe in classes">
+                        <td> {{ classe.name }} </td>
+                        <td>
+                            <button id="edit-classe"
+                                    v-on:click.prevent="onClassesClick(classe.name)">Modifier</button>
+                        </td>
+
+                        <modal v-if="editClasse" @close="editClasse = false">
+                            <h3 slot="header">custom header</h3>
+                        </modal>
+
+
+                        <td>
+                            <button v-on:click.prevent="deleteClasse(classe.name)">remove</button>
+                        </td>
+
+                    </tbody>
+                </table>
+            </div>                      -->
+
+        </section>
+
+        <section v-if="currentPage === 'classAdd'" id="classAdd">
+
+
+            <section v-if="currentPage === 'userAdd'" id="userAdd">
+
+                <form action="/users/new">
+
+                    <h1>Ajout d'un nouvel utilisateur</h1>
+                    <br>
+                    <tr>
+                        <th> Nom : </th><br>
+                        <td> <input type=text name="name" value="test"/> </td>
+                    </tr><br>
+
+                    <tr>
+                        <th> Mot de passe : </th><br>
+                        <td> <input type="password" name="password" value="test"/> </td>
+                    </tr><br>
+
+                    <tr>
+                        <th> Profil : </th><br>
+                        <td> <input type=text name="profile" value="eleve"/> </td>
+                    </tr><br> <tr>
+
+                    <th> Classe : </th><br>
+                    <td> <input type=text name="classe" value="4A"/> </td>
+                </tr><br>
+
+                    <input type="submit" formmethod="post" value="Valider">
+                </form>
+
+            </section>
+
+    <!--        <form action="/classes/new">
+                <caption>
+                    Ajout d'une nouvelle classe
+                </caption><br>
+                <tr>
+                    <th> Nom : </th>
+                    <td> <input type=text name="name" value="3A"/> </td>
+                </tr><br>
+
+                <input type="submit" formmethod="post" value="Valider">
+            </form>             -->
+
+        <section v-else-if="currentPage == 'userList'">
+
+            <h1>
+                Liste des utilisateurs
+            </h1>
+
+            <div>
+                <table> <!-- id="user_tab">     -->
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Profil</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="user in users">
+                            <td> {{ user.name }} </td>
+                            <td> {{ user.profile}}</td>
+                            <td> <button id="del_btn" v-on:click.prevent="deleteUser(user.name)">remove</button></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+
+
+<!--
+            <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Nom</td>
+                                <td>Profil</td>
+                                <td>Delete</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="user in users">
+                                <td> {{ user.name }} </td>
+                                <td> {{ user.profile }}</td>
+                                <td> <button v-on:click.prevent="deleteUser(user.name)">remove</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+-->
+        </section>
+
+        <section v-else-if="currentPage == 'matiere'">
+
+
+
+
+        </section>
+
+
+
+    </main>
+
+    <script type="text/x-template" id="changePassword">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/users/changepassword">
+                            <caption class="modal-header">
+                                <h1> Changement de mot de passe </h1>
+                            </caption><br>
+                            <tr class="modal-body">
+                                <th> Mot de passe actuel : </th>
+                                <td> <input type="password" name="currentPassword"/> </td>
+                            </tr><br>
+
+                            <tr class="modal-body">
+                                <th> Nouveau mot de passe : </th>
+                                <td> <input type="password" name="newPassword"/> </td>
+                            </tr><br>
+
+                            <tr class="modal-body">
+                                <th> Confirmation du nouveau mot de passe : </th>
+                                <td> <input type="password" name="newPassword2"/> </td>
+                            </tr><br>
+
+                            <input type="submit" formmethod="post" value="Valider"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="editClasse">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/classes/rename">
+                            <caption class="modal-header">
+                                <h1> Renommer la classe </h1>
+                            </caption><br>
+
+                            <input type="hidden" name="oldname" :value="oldname">
+
+                            <tr class="modal-body">
+                                <th> Nom : </th>
+                                <td> <input type="text" name="newname" :value="oldname"/> </td>
+                            </tr>
+
+                            <input type="submit" formmethod="post" value="Valider"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script>
+
+
+        Vue.component('modal', {
+            template: '#changePassword'
+        });
+
+        Vue.component('modal', {
+            template: '#editClasse',
+            data: function () {
+                return {
+                    oldname: this.$parent.classesOldName
+
+                }
+            }
+        });
+
+        new Vue({
+            el: '#admin',
+            data: {
+                users: [],
+                classes: [],
+                classesOldName: null,
+                profiles: [],
+                loading: true,
+                errored: false,         
+                currentPage: '',
+                showModalPWC: false,
+                editClasse: false
+            },
+            created () {
+                this.getUsers();
+                this.getClasses();
+                this.getProfiles();
+            },
+            methods: {
+                getUsers: function () {
+                    axios
+                        .get('/users/list')
+                        .then(response => {
+                            this.users = response.data})
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false)
+                },
+                deleteUser: function (userName) {
+                    axios
+                        .delete('/users/delete',
+                            {params: {'name': userName}})
+                        .then((response) => {
+                            console.log(response)
+                        })
+                        .finally(this.getUsers());
+                },
+                getClasses: function () {
+                    axios
+                        .get('/classes/list')
+                        .then(response => {
+                            this.classes = response.data})
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false)
+                },
+                deleteClasse: function (classeName) {
+                    axios
+                        .delete('/classes/delete',
+                            {params: {'name': classeName}})
+                        .then(() => {
+                            this.getClasses()
+                        })
+                        .finally();
+                },
+                getProfiles: function () {
+                    axios
+                        .get('/profiles/list')
+                        .then(response => {
+                            this.profiles = response.data})
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false)
+                },
+                onClassesClick: function (name) {
+                    this.classesOldName = name;
+                    this.editClasse = true;
+                }
+            }
+        });
+
+
+    </script>
+
+</body>
+

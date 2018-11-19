@@ -1,0 +1,51 @@
+const users = require('../users');
+const usersModels = require('../models/users');
+const dbUsers = require('../database/users');
+
+
+exports.loginCheck = async function (id, password, res) {
+
+    /*
+    0 = login KO
+    1 = admin
+    2 = prof
+    3 = eleve
+    */
+    const userSalt = await dbUsers.getUserSalt(id)
+        .then(resolve => {
+            return resolve;
+        })
+        .catch(function(reject){
+            throw(res.send(reject));
+        });
+
+
+    const hashedPassword = await usersModels.hashPassword(password, userSalt);
+
+    const dbResult = await dbUsers.authenticateUser(id, hashedPassword)
+        .then(resolve => {
+            console.log(resolve);
+            return resolve;
+        }, reject => {
+            res.status(501).send('Database connection error : ' + reject);
+        });
+
+
+            if(dbResult.length === 1) {
+                return dbResult[0].profileId;
+            } else {
+                return 0;
+            };
+};
+
+async function dbQuery (id, hashedPassword, res) {
+
+    await dbUsers.authenticateUser(id, hashedPassword)
+        .then(resolve => {
+            console.log(resolve);
+            return resolve;
+        }, reject => {
+            res.status(501).send('Database connection error : ' + reject);
+        });
+
+}

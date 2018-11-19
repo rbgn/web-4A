@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Titre de la page</title>
+    <style>
+        nav ul li {
+            display: inline-block;
+            border: 1px solid red;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<main id="app">
+    <nav>
+        <ul>
+            <li v-on:click="currentPage = 'accueil'">Accueil</li>
+            <li v-on:click="currentPage = 'quisommesnous'">Qui sommes-nous ?</li>
+            <li v-on:click="currentPage = 'liste'">liste</li>
+        </ul>
+    </nav>
+    <accueil
+            v-if="currentPage === 'accueil'">
+    </accueil>
+
+    <section v-else-if="currentPage === 'quisommesnous'" id="quisommesnous">
+        <h1>Ceci est la page qui sommes-nous ?</h1>
+        <p>Ceci est le texte qui décrit qui je suis</p>
+    </section>
+    <section v-else-if="currentPage === 'liste'" id="liste">
+        <ul>
+            <li v-for="item in myList">{{ item.name }}</li>
+        </ul>
+        <input type="text" v-model="name">
+        <button v-on:click="sendNewElement()">Ajouter !</button>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
+<script src="accueil.component.js"></script>
+<script>
+    // Sans cette ligne + l'import de axios.js (2e <script>), this.$http ne fonctionnera pas
+    Vue.prototype.$http = axios
+    const app = new Vue({
+        el: '#app',
+        data: {
+            currentPage: 'liste',
+            filter: '',
+            menu: '',
+            myList: [],
+            name: ''
+        },
+        created () {
+            // Ici, l'utilisation d'une fonction flêchée () => {} plutôt que function () {} est primordial !
+            // sans fonction fléchée, this.myList = ... ne fonctionnera pas comme prévu
+            this.$http.get('/list')
+                .then(list => {
+                    console.log('affichage de ma liste', list)
+                    this.myList = list.data
+                })
+                .catch(err => {
+                    console.log('error', err)
+                })
+        },
+        methods: {
+            sendNewElement () {
+                this.$http.post('/list', {
+                    name: this.name
+                })
+                    .then(() => {
+                        this.myList.push({
+                            name: this.name
+                        })
+                    })
+            }
+        }
+    })
+</script>
+</body>
+</html>

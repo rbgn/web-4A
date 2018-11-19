@@ -1,0 +1,44 @@
+[
+    {
+        "name": "admin",
+        "password": "55e96ba773e11f02d2db12be897266b27f1ccf71ec6c48e04b3f70e8802a58ac",
+        "salt": "a56578970765436798639",
+        "profile": "admin"
+    },
+    {
+        "name": "prof",
+        "profile": "prof",
+        "salt": "d8ffaed8e34ca1aa23e765a45e7470388b071768e5e3eef44bce182625e3f1ab",
+        "password": "70dde5b3ff30c23cc32b624d1a5840d79bfe1ef53feeca5ff3c40c29187d82b8"
+    },
+    {
+        "name": "eleve",
+        "profile": "3A",
+        "salt": "525fbabb8fe7340a0107bb3851616394286dd4924fae76cb366e751c82ad9b47",
+        "password": "994d4773750da9f927b877f9a0b17a5d490639fbe517701b8e81fa23d12c0244"
+    },
+    {
+        "name": "admin",
+        "profile": "4A",
+        "salt": "54d1278ff7dfecb47db9ce375c3d40410d8c489d3acf8be1bca10dbb13737a47",
+        "password": "fa747bc29214706c974881a42ecd6cd39eb3b06b137ede494ea0f5601b784870"
+    },
+    {
+        "name": "test",
+        "profile": "4A",
+        "salt": "d755657e3fc92b44587018c8aef395ac38a77c34d9c972c7445233510989221f",
+        "password": "da07e28971600e4017af74bfa22c4976bb5b860da514ca0fcab588d83a0a6a93"
+    },
+    {
+        "name": "test",
+        "profile": "4A",
+        "salt": "fa20da29b4b09e209547d160082a7d9e966fed458de63a2e842a603c7e8ad7e1",
+        "password": "2c53ae8f9fd6efc6a6311efa21af04884f1948598bb0a92ba10a8d7dbe5f0b05"
+    },
+    {
+        "name": "test",
+        "profile": "4A",
+        "salt": "01668d1300b448bbfd45a4e8c7260d60b1091e641c7ec917bc83da266c5b8589",
+        "password": "9ed5906e339ac6d7fca3f1a051d69c0a3c3212a85be3f491495569583cae34cb"
+    }
+]
