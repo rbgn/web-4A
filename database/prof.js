@@ -32,12 +32,11 @@ exports.myClasses = function (profName) {
         })
     };
 
-
 exports.getMatiereNotes = function (promo, matiere) {
     return new Promise(function (resolve, reject) {
         pool.query(
             'SELECT eleves.classe "promo", eleves.eleve "eleve", n.note "note", n."noteMax", n.coef, n."eleveId" ' +
-            'FROM "projet-web".note AS n ' +
+            'FROM "projet-web".notes AS n ' +
             'FULL JOIN (SELECT c.name AS "classe", u.name "eleve", m.id "matiereId", u.id ' +
             '           FROM "projet-web".users AS u ' +
             '           JOIN "projet-web".classe AS c ' +
@@ -55,5 +54,115 @@ exports.getMatiereNotes = function (promo, matiere) {
                 resolve(result.rows);
             }
         )
+    })
+};
+
+exports.doesNoteExists = async function(matiere, eleve) {
+
+    test = await pool.query('SELECT 1 as result ' +
+                        'FROM "projet-web".notes ' +
+                        'WHERE "matiereId" = (SELECT id ' +
+                        '   FROM "projet-web".matiere ' +
+                        '   WHERE name = $1) ' +
+                        'AND "eleveId" = (SELECT id ' +
+                        '   FROM "projet-web".users ' +
+                        '   WHERE name = $2);', [matiere, eleve])
+    if(test.rowCount > 0) {
+        return true;
+    } else {
+        return false
+    }
+
+};
+
+exports.updateNote = async function (note, matiere, eleve) {
+
+    const client = await pool.connect();
+
+    return new Promise(async function (resolve, reject) {
+
+        try {
+
+            await client.query('BEGIN;');
+            await client.query('UPDATE "projet-web".notes ' +
+                'SET note = ($1) ' +
+                'WHERE ("matiereId" = (SELECT id ' +
+                '       FROM "projet-web".matiere ' +
+                '       WHERE name = $2) ' +
+                '   AND "eleveId" = (SELECT id ' +
+                '       FROM "projet-web".users ' +
+                '       WHERE name = $3));', [note, matiere, eleve]);
+
+            const test2 = await pool.query('SELECT * FROM "projet-web".notes');
+
+            const test = await pool.query('SELECT 1 AS "result" ' +
+            'FROM "projet-web".notes ' +
+            'WHERE "matiereId" = (SELECT id ' +
+            'FROM "projet-web".matiere ' +
+            'WHERE name = $1) ' +
+            'AND "eleveId" = (SELECT id ' +
+            'FROM "projet-web".users ' +
+            'WHERE name = $2) ' +
+            'AND note = $3;', [matiere, eleve, note]);
+
+            if (test.rowCount === 1) {
+                await client.query('COMMIT');
+                resolve(1)
+            } else {
+                await client.query('ROLLBACK');
+                reject('Update error.')
+            }
+
+        } catch (e) {
+            await client.query('ROLLBACK');
+            reject('Update error.')
+
+        } finally {
+            client.release()
+        }
+    })
+};
+
+exports.newNote = async function (note, matiere, eleve) {
+
+    const client = await pool.connect();
+    return new Promise(async function (resolve, reject) {
+
+        try {
+
+            await client.query('BEGIN;');
+            await client.query('INSERT INTO "projet-web".notes ' +
+                '(note,"matiereId", "eleveId") ' +
+                'VALUES ($1, (SELECT id ' +
+                '        FROM "projet-web".matiere ' +
+                '        WHERE name = $2), ' +
+                '        (SELECT id ' +
+                '        FROM "projet-web".users ' +
+                '        WHERE name = $3));', [note, matiere, eleve]);
+
+            const test = await client.query('SELECT 1 "result" ' +
+                            'FROM "projet-web".notes ' +
+                            'WHERE (note = $1 AND ' +
+                            '   "matiereId" = (SELECT id ' +
+                            '        FROM "projet-web".matiere ' +
+                            '        WHERE name = $2) AND ' +
+                            '   "eleveId" = (SELECT id ' +
+                            '        FROM "projet-web".users ' +
+                            '        WHERE name = $3));', [note, matiere, eleve])
+
+            if (test.rowCount === 1) {
+                await client.query('COMMIT');
+                resolve(1)
+            } else {
+                await client.query('ROLLBACK');
+                reject('Insert error.')
+            }
+        } catch (e) {
+            await client.query('ROLLBACK');
+            reject('Insert error.')
+
+        } finally {
+            client.release()
+        }
     })
 };

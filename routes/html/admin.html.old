@@ -18,38 +18,22 @@
 
 
         <div class="navbar">
-            <div class="dropdown">
-                <button style="float:right" class="dropbtn">Gérer les utilisateurs
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a v-on:click="currentPage = 'userList'">Lister les utilisateurs</a>
-                    <a v-on:click="currentPage = 'userAdd'">Ajouter un utilisateur</a>
-                </div>
-            </div>
-
-            <div class="dropdown">
-                <button style="float:right" class="dropbtn">Gérer les classes
-                    <i class="fa fa-caret-down"></i>
-                </button>
-                <div class="dropdown-content">
-                    <a v-on:click="currentPage = 'classList'">Lister les classes</a>
-                    <a v-on:click="currentPage = 'classAdd'">Ajouter une classe</a>
-
-                </div>
-            </div>
-            <a v-on:click="currentPage = 'matiere'">Matières</a>
+            <a v-on:click="currentPage = 'classManage'">Gérer les classes</a>
+            <a v-on:click="currentPage = 'userManage'">Gérer les utilisateurs</a>
+            <a v-on:click="currentPage = 'matiereManage'">Gérer les matières</a>
             <div class="dropdown">
                 <button style="float:right" class="dropbtn">Menu
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">test</a>
-                    <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
-                        <modal v-if="showModalPWC" @close="showModalPWC = false">
+
+                   <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
+                        <change-password v-if="showModalPWC" @close="showModalPWC = false">
                             <h3 slot="header">custom header</h3>
-                        </modal>
+                        </change-password>
+
                     <a href="/users/logout">Se déconnecter</a>
+
                 </div>
             </div>
         </div>
@@ -57,74 +41,53 @@
 
         <section v-if="currentPage === 'userAdd'" id="userAdd">
 
+
             <form action="/users/new">
-                <caption>
-                    Ajout d'un nouvel utilisateur
-                </caption><br>
+                
+                <h1>Ajout d'un nouvel utilisateur</h1>
+                <br>
                 <tr>
-                    <th> Nom : </th>
-                    <td> <input type=text name="name"/> </td>
+                    <th> Nom : </th><br>
+                    <td> <input type=text name="name" value="test"/> </td>
                 </tr><br>
 
                 <tr>
-                    <th> Mot de passe : </th>
-                    <td> <input type="password" name="password"/> </td>
+                    <th> Mot de passe : </th><br>
+                    <td> <input type="password" name="password" value="test"/> </td>
                 </tr><br>
 
                 <tr>
-                    <th> Profil d'utilisateur : </th>
-                    <select v-model="selected" name="profile">
-                        <option v-for="profile in profiles" v-bind:value="profile.name">
-                            {{ profile.name }}
-                        </option>
-                    </select>
-                </tr><br>
+                    <th> Profil : </th><br>
+                    <td> <input type=text name="profile" value="eleve"/> </td>
+                </tr><br> <tr>
 
-                <tr>
-                    <th> Classe : </th>
-                    <select v-model="selected" name="classe">
-                        <option v-for="classe in classes" v-bind:value="classe.name">
-                            {{ classe.name }}
-                        </option>
-                    </select>
-                </tr><br>
+                <th> Classe : </th><br>
+                <td> <input type=text name="classe" value="4A"/> </td>
+            </tr><br>
 
-                <input type="submit" formmethod="post" value="Valider"
-                       v-on:click="getUsers">
+                <input type="submit" formmethod="post" value="Valider">
             </form>
 
         </section>
 
-        <section v-else-if="currentPage == 'classList'">
+        <section v-else-if="currentPage == 'classManage'">
 
-            <h1> Liste des classes </h1>
 
-            <div class="navbar">
-                <a v-on:click="currentPage = 'userAdd'">Ajouter un utilisateur</a>
-                <a v-on:click="currentPage = 'classManage'">Gérer les classes</a>
-                <a v-on:click="currentPage = 'userManage'">Gérer les utilisateurs</a>
-                <div class="dropdown">
-                    <button style="float:right" class="dropbtn">Menu
-                        <i class="fa fa-caret-down"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="#">test</a>
-                        <a id="change-Password" @click="showModalPWC = true">Changement de mot de passe</a>
-                        <modal v-if="showModalPWC" @close="showModalPWC = false">
-                            <h3 slot="header">custom header</h3>
-                        </modal>
-                        <a href="/users/logout">Se déconnecter</a>
-                    </div>
-                </div>
-            </div>
+            <h1> Gestion des classes</h1>
 
- <!--           <div>
-                <table>
+
+            <button id="add-classe" @click="addClasse = true">Ajouter une nouvelle classe</button>
+            <add-classe v-if="addClasse" @close="addClasse = false">
+                <h3 slot="header">custom header</h3>
+            </add-classe>
+
+
+            <div>
+                <table id="user_tab">
                     <thead>
                     <tr>
                         <td>Nom</td>
-                        <td>Renommer</td>
-                        <td>Supprimer</td>
+                        <td>Action</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -132,124 +95,101 @@
                         <td> {{ classe.name }} </td>
                         <td>
                             <button id="edit-classe"
-                                    v-on:click.prevent="onClassesClick(classe.name)">Modifier</button>
-                        </td>
-
-                        <modal v-if="editClasse" @close="editClasse = false">
-                            <h3 slot="header">custom header</h3>
-                        </modal>
-
-
-                        <td>
-                            <button v-on:click.prevent="deleteClasse(classe.name)">remove</button>
+                                    v-on:click.prevent="onClassesClick(classe.name)">Renommer</button>
+                            <edit-classe v-if="editClasse" @close="editClasse = false">
+                                <h3 slot="header">custom header</h3>
+                            </edit-classe>
+                            <button v-on:click.prevent="deleteClasse(classe.name)">Supprimer</button>
                         </td>
 
                     </tbody>
-                </table>
-            </div>                      -->
-
-        </section>
-
-        <section v-if="currentPage === 'classAdd'" id="classAdd">
-
-
-            <section v-if="currentPage === 'userAdd'" id="userAdd">
-
-                <form action="/users/new">
-
-                    <h1>Ajout d'un nouvel utilisateur</h1>
-                    <br>
-                    <tr>
-                        <th> Nom : </th><br>
-                        <td> <input type=text name="name" value="test"/> </td>
-                    </tr><br>
-
-                    <tr>
-                        <th> Mot de passe : </th><br>
-                        <td> <input type="password" name="password" value="test"/> </td>
-                    </tr><br>
-
-                    <tr>
-                        <th> Profil : </th><br>
-                        <td> <input type=text name="profile" value="eleve"/> </td>
-                    </tr><br> <tr>
-
-                    <th> Classe : </th><br>
-                    <td> <input type=text name="classe" value="4A"/> </td>
-                </tr><br>
-
-                    <input type="submit" formmethod="post" value="Valider">
-                </form>
-
-            </section>
-
-    <!--        <form action="/classes/new">
-                <caption>
-                    Ajout d'une nouvelle classe
-                </caption><br>
-                <tr>
-                    <th> Nom : </th>
-                    <td> <input type=text name="name" value="3A"/> </td>
-                </tr><br>
-
-                <input type="submit" formmethod="post" value="Valider">
-            </form>             -->
-
-        <section v-else-if="currentPage == 'userList'">
-
-            <h1>
-                Liste des utilisateurs
-            </h1>
-
-            <div>
-                <table> <!-- id="user_tab">     -->
-                    <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Profil</th>
-                        <th>Delete</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr v-for="user in users">
-                            <td> {{ user.name }} </td>
-                            <td> {{ user.profile}}</td>
-                            <td> <button id="del_btn" v-on:click.prevent="deleteUser(user.name)">remove</button></td>
-                        </tr>
-                    </tbody>
-
                 </table>
             </div>
 
+        </section>
+
+        <section v-else-if="currentPage == 'userManage'">
+
+            <h1>Liste des utilisateurs</h1>
+
+            <button id="add-user" @click="addUser = true">Ajouter un nouvel utilisateur</button>
+            <add-user v-if="addUser" @close="addUser = false">
+                <h3 slot="header">custom header</h3>
+            </add-user>
 
 
-<!--
             <div>
-                    <table>
+                    <table id="user_tab">
                         <thead>
                             <tr>
-                                <td>Nom</td>
-                                <td>Profil</td>
-                                <td>Delete</td>
+                                <th>Nom</th>
+                                <th>Profil</th>
+                                <th>Classe</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="user in users">
                                 <td> {{ user.name }} </td>
-                                <td> {{ user.profile }}</td>
-                                <td> <button v-on:click.prevent="deleteUser(user.name)">remove</button></td>
+                                <td> {{ user.profile}}</td>
+                                <td> {{ user.classe }}</td>
+                                <td>
+                                    <button id="password-reseted-user" @click="resetUserPassword(user.name)">Réinitialiser le mot de passe</button>
+                                    <reset-user-password v-if="adminResetUserPassword" @close="adminResetUserPassword = false">
+                                        <h3 slot="header">custom header</h3>
+                                    </reset-user-password>
+                                    <button id="edit-user" @click="onUserClick(user.name, user.profile, user.classe)">Modifier</button>
+                                    <edit-user v-if="editUser" @close="editUser = false">
+                                        <h3 slot="header">custom header</h3>
+                                    </edit-user>
+                                    <button id="del_btn" v-on:click.prevent="deleteUser(user.name)">remove</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
             </div>
--->
+
         </section>
 
-        <section v-else-if="currentPage == 'matiere'">
+        <section v-else-if="currentPage == 'matiereManage'">
+
+            <h1> Gestion des matières</h1>
+
+            <button id="add-matiere" @click="addMatiere = true">Ajouter une nouvelle matière</button>
+            <add-matiere v-if="addMatiere" @close="addMatiere = false">
+                <h3 slot="header">custom header</h3>
+            </add-matiere>
 
 
+            <div>
+                <table id="user_tab">
+                    <thead>
+                    <tr>
+                        <td>Nom</td>
+                        <td>Coefficient</td>
+                        <td>Classe</td>
+                        <td>Prof</td>
+                        <td>Actions</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="matiere in matieres">
+                        <td> {{ matiere.name }} </td>
+                        <td> {{ matiere.coef }}</td>
+                        <td> {{ matiere.classe }}</td>
+                        <td> {{ matiere.prof }}</td>
+                        <td>
+                            <button id="edit-matiere"
+                                    v-on:click.prevent="onMatieresClick(matiere.name, matiere.coef, matiere.prof, matiere.classe)">Renommer</button>
+                            <edit-matiere v-if="editMatiere" @close="editMatiere = false">
+                                <h3 slot="header">custom header</h3>
+                            </edit-matiere>
+                            <button v-on:click.prevent="deleteMatiere(matiere.name)">Supprimer</button>
+                        </td>
 
+                    </tbody>
+                </table>
+            </div>
 
         </section>
 
@@ -324,18 +264,364 @@
         </transition>
     </script>
 
+    <script type="text/x-template" id="addClasse">
+
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+                        <form action="/classes/new">
+                            <caption>
+                                Ajout d'une nouvelle classe
+                            </caption><br>
+
+                            <tr>
+                                <th> Nom : </th>
+                                <td> <input type=text name="name"/> </td>
+                            </tr><br>
+
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type="submit" formmethod="post" value="Valider">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </script>
+
+    <script type="text/x-template" id="editUser">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/users/edit">
+                            <caption class="modal-header">
+                                <h1> Modifier l'utilisateur </h1>
+                            </caption><br>
+
+                            <input type="hidden" name="oldname" :value="oldname">
+                            <input type="hidden" name="oldclasse" :value="oldclasse">
+                            <input type="hidden" name="oldprofile" :value="oldprofile">
+
+                            <tr class="modal-body">
+                                <th> Nom : </th>
+                                <td> <input type="text" name="newname" :value="oldname"/> </td>
+                            </tr>
+
+                            <tr>
+                                <th> Profil : </th><br>
+                                <td>
+                                    <select name="newprofile" :value="oldprofile">
+                                        <option v-model="profile" v-for="profile in profiles">
+                                            {{ profile.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Classe : </th><br>
+                                <select v-model="selected" name="newclasse" :value="oldclasse">
+                                    <option v-for="classe in classes">
+                                        {{ classe.name }}
+                                    </option>
+                                </select>
+                            </tr><br>
+
+
+                            <input type="submit" formmethod="post" value="Valider"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="addUser">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/users/new">
+
+                            <h1>Ajout d'un nouvel utilisateur</h1>
+                            <br>
+                            <tr>
+                                <th> Nom : </th><br>
+                                <td> <input type=text name="name"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Mot de passe : </th><br>
+                                <td> <input type="password" name="password"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Profil : </th><br>
+                                <td>
+                                    <select name="profile">
+                                        <option v-model="profile" v-for="profile in profiles">
+                                            {{ profile.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Classe : </th><br>
+                                <select v-model="selected" name="classe">
+                                    <option v-for="classe in classes">
+                                        {{ classe.name }}
+                                    </option>
+                                </select>
+                            </tr><br>
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type="submit" formmethod="post" value="Valider">
+                     </form>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="editMatiere">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/matieres/edit">
+                            <caption>
+                                Modifier la matière
+                            </caption><br>
+
+                            <input type="hidden" name="oldname" :value="oldname">
+                            <input type="hidden" name="oldcoef" :value="oldcoef">
+                            <input type="hidden" name="oldprof" :value="oldprof">
+                            <input type="hidden" name="oldclasse" :value="oldclasse">
+
+
+
+                            <tr>
+                                <th> Nom : </th>
+                                <td> <input type=text name="name" :value="oldname"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Coefficient : </th>
+                                <td> <input type=number name="coef" :value="oldcoef"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Classe : </th><br>
+                                <td>
+                                    <select name="classe" :value="oldclasse">
+                                        <option v-for="classe in classes">
+                                            {{ classe.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Professeur : </th><br>
+                                <td>
+                                    <select name="prof" :value="oldprof">
+                                        <option v-for="prof in profs">
+                                            {{ prof.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type="submit" formmethod="post" value="Valider">
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="addMatiere">
+
+        <transition name="addMatiere">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/matieres/new">
+                            <caption>
+                                Ajout d'une nouvelle matière
+                            </caption><br>
+
+                            <tr>
+                                <th> Nom : </th>
+                                <td> <input type=text name="name"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Coefficient : </th>
+                                <td> <input type=number name="coef"/> </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Classe : </th><br>
+                                <td>
+                                    <select name="classe">
+                                        <option v-for="classe in classes">
+                                            {{ classe.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <tr>
+                                <th> Professeur : </th><br>
+                                <td>
+                                    <select name="prof">
+                                        <option v-for="prof in profs">
+                                            {{ prof.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr><br>
+
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type="submit" formmethod="post" value="Valider">
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="resetUserPassword">
+
+        <transition name="resetUserPassword">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <form action="/users/adminresetpassword">
+                            <caption class="modal-header">
+                                <h1> Réinitialisation de mot de passe </h1>
+                            </caption><br>
+
+                            <input type="hidden" name="name" :value="name">
+
+                            <tr class="modal-body">
+                                <th> Nouveau mot de passe : </th>
+                                <td> <input type="password" name="newPassword"/> </td>
+                            </tr><br>
+
+                            <tr class="modal-body">
+                                <th> Confirmation du nouveau mot de passe : </th>
+                                <td> <input type="password" name="newPassword2"/> </td>
+                            </tr><br>
+
+                            <input type="submit" formmethod="post" value="Valider"
+                                   class="modal-default-button" @click="$emit('close')">
+                            <input type = "button" value="Annuler"
+                                   class="modal-default-button" @click="$emit('close')">
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </script>
+
     <script>
 
 
-        Vue.component('modal', {
+        Vue.component('change-password', {
             template: '#changePassword'
         });
 
-        Vue.component('modal', {
+        Vue.component('reset-user-password', {
+            template: '#resetUserPassword',
+            data: function () {
+                return {
+                    name: this.$parent.passwordResetedUser
+                }
+            }
+        });
+
+        Vue.component('edit-matiere', {
+            template: '#editMatiere',
+            data: function () {
+                return {
+                    oldname: this.$parent.matiereOldName,
+                    oldcoef: this.$parent.matiereOldCoef,
+                    oldprof: this.$parent.matiereOldProf,
+                    oldclasse: this.$parent.matiereOldClasse,
+                    classes: this.$parent.classes,
+                    profs: this.$parent.profs
+                }
+            }
+        });
+
+        Vue.component('add-matiere', {
+            template: '#addMatiere',
+            data: function () {
+                return {
+                    profile: null,
+                    classes: this.$parent.classes,
+                    profs: this.$parent.profs
+                }
+            }
+        });
+
+        Vue.component('edit-classe', {
             template: '#editClasse',
             data: function () {
                 return {
                     oldname: this.$parent.classesOldName
+
+                }
+            }
+        });
+
+        Vue.component('edit-user', {
+            template: '#editUser',
+            data: function () {
+                return {
+                    oldname: this.$parent.userOldName,
+                    oldprofile: this.$parent.userOldProfile,
+                    oldclasse: this.$parent.userOldClasse,
+                    classes: this.$parent.classes,
+                    profiles: this.$parent.profiles
+
+                }
+            }
+        });
+
+        Vue.component('add-classe', {
+            template: '#addClasse'
+        });
+
+        Vue.component('add-user', {
+            template: '#addUser',
+            data: function () {
+                return {
+                    profile: null,
+                    profiles: this.$parent.profiles,
+                    classes: this.$parent.classes
 
                 }
             }
@@ -346,18 +632,36 @@
             data: {
                 users: [],
                 classes: [],
+                matieres: [],
+                profs: [],
                 classesOldName: null,
+                matiereOldName: null,
+                matiereOldCoef: null,
+                matiereOldClasse: null,
+                matiereOldProf: null,
+                userOldName: null,
+                userOldClasse: null,
+                userOldProfile: null,
+                passwordResetedUser: null,
                 profiles: [],
                 loading: true,
-                errored: false,         
+                errored: false,
                 currentPage: '',
+                adminResetUserPassword: false,
                 showModalPWC: false,
-                editClasse: false
+                editClasse: false,
+                addClasse: false,
+                editUser: false,
+                addUser: false,
+                editMatiere: false,
+                addMatiere: false
             },
             created () {
                 this.getUsers();
                 this.getClasses();
                 this.getProfiles();
+                this.getMatieres();
+                this.getProfs()
             },
             methods: {
                 getUsers: function () {
@@ -379,6 +683,18 @@
                             console.log(response)
                         })
                         .finally(this.getUsers());
+                },
+                getProfs: function () {
+                    axios
+                        .get('/users/getprofs')
+                        .then(response => {
+                            this.profs = response.data
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false)
                 },
                 getClasses: function () {
                     axios
@@ -411,12 +727,50 @@
                         })
                         .finally(() => this.loading = false)
                 },
+                getMatieres: function () {
+                    axios
+                        .get('/matieres/list')
+                        .then(response => {
+                            this.matieres = response.data})
+                        .catch(error => {
+                            console.log(error);
+                            this.errored = true;
+                        })
+                        .finally(() => this.loading = false)
+                },
+                deleteMatiere: function (matiereName) {
+                    axios
+                        .delete('/matieres/delete',
+                            {params: {'name': matiereName}})
+                        .then(() => {
+                            this.getMatieres()
+                        })
+                        .finally();
+                },
                 onClassesClick: function (name) {
                     this.classesOldName = name;
                     this.editClasse = true;
+                },
+                onUserClick: function (name, profile, classe) {
+                    this.userOldName = name;
+                    this.userOldProfile = profile;
+                    this.userOldClasse = classe;
+                    this.editUser = true;
+                },
+                onMatieresClick: function (name, coef, prof, classe) {
+                    this.matiereOldClasse = classe;
+                    this.matiereOldProf = prof;
+                    this.matiereOldCoef = coef;
+                    this.matiereOldName = name;
+                    this.editMatiere = true;
+                },
+                resetUserPassword: function (user) {
+                    this.passwordResetedUser = user;
+                    this.adminResetUserPassword = true;
                 }
             }
         });
+
 
 
     </script>

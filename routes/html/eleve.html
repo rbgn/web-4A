@@ -1,10 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ADMIN</title>
+<head xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <link rel="stylesheet" type="text/css" href="stylesheets/prof.css"/>
+
+    <!--   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+
 </head>
+
 <body>
-Tu es logué en tant qu'élève.
+<main id="eleve">
+    <h1> Mes notes </h1>
+
+    <div>
+        <table id="user_tab">
+            <thead>
+            <tr>
+                <td> Matière </td>
+                <td> Note </td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="note in notes">
+                <td> {{ note.name }}</td>
+                <td> {{ note.note }}</td>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+
+
+
+<script>
+
+    new Vue({
+        el: '#eleve',
+        data: {
+            notes: [],
+            loading: true
+        }, created () {
+            this.getNotes();
+        }, methods: {
+            getNotes: function () {
+                axios
+                    .get('/eleves/getnotes')
+                    .then(response => {
+                        this.notes = response.data
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.errored = true;
+                    })
+                    .finally(() => this.loading = false)
+            }
+        }
+    })
+
+</script>
+
 </body>
-</html>

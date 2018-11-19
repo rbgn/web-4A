@@ -12,4 +12,8 @@ router.post('/notesbymatiere', function (req, res, next) {
     profControl.getMatiereNotes(req, res, next);
 });
 
+router.post('/newnote', function (req, res, next) {
+    profControl.newNote (req, res, next);
+});
+
 module.exports = router;
