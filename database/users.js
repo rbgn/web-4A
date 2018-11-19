@@ -176,7 +176,7 @@ exports.getUserSalt = async function (userName, res) {
                 if (err) {
                     reject(err)
                 }
-                if (result.rows.length === 1){
+                if (result.rowCount === 1){
                     resolve(result.rows["0"].salt);
                 } else {
                     reject("Unknown user.");
