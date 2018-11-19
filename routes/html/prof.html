@@ -70,7 +70,6 @@
     <section v-if="currentPage === 'notes'" id="notes">
 
         <h1> Notes</h1>
-        Cool
 
         <div>
             <table id="user_tab">
@@ -78,12 +77,20 @@
                 <tr>
                     <td>Nom</td>
                     <td>Note</td>
+                    <td>Éditer</td>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="note in notesByMatiere">
                     <td> {{ note.eleve }}</td>
                     <td> {{ note.note }}</td>
+                    <td>
+                        <button id="edit-note" @click="onNoteClick(note.eleve, note.promo, )">Modifier la note</button>
+                        <edit-note v-if="editNote" @close="editNote = false">
+                            <h3 slot="header">custom header</h3>
+                        </edit-note>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -92,12 +99,66 @@
 
 </main>
 
+
+<script type="text/x-template" id="editNote">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+
+                    <form action="/prof/newnote">
+                        <caption>
+                            Modification d'une note
+                        </caption><br>
+
+                        <input type="hidden" name="classe" :value="classe">
+                        <input type="hidden" name="matiere" :value="matiere">
+
+                        <tr>
+                            <th> Nom : </th>
+                            <td> <textarea readonly name="name" :value="name"/> </td>
+                        </tr><br>
+
+                        <tr>
+                            <th> Note : </th>
+                            <td> <input type=number name="note"/> </td>
+                        </tr><br>
+
+
+                        <input type = "button" value="Annuler"
+                               class="modal-default-button" @click="$emit('close')">
+                        <input type="submit" formmethod="post" value="Valider">
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </transition>
+</script>
+
 <script>
+
+    Vue.component('edit-note', {
+        template: '#editNote',
+        data: function () {
+            return {
+                name: this.$parent.noteName,
+                classe: this.$parent.noteClasse,
+                matiere: this.$parent.noteMatiere
+            }
+        }
+    });
+
     new Vue({
         el: '#prof',
         data: {
             currentPage: '',
             showModalPWC: false,
+            editNote: false,
+            noteName: null,
+            noteClasse: null,
+            noteMatiere: null,
             myClasses: [],
             notesByMatiere: []
         },
@@ -125,6 +186,7 @@
                     })
                     .then(response => {
                         this.notesByMatiere = response.data;
+                        this.noteMatiere = matiere;
                         this.currentPage = 'notes';
                     })
                     .catch(error => {
@@ -133,6 +195,11 @@
                     })
                 //                       .finally(() => this.currentPage = 'notes')
             },
+            onNoteClick: function (name, classe) {
+                this.noteName = name;
+                this.noteClasse = classe;
+                this.editNote = true;
+            }
         }
     })
 </script>

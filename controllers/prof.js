@@ -20,4 +20,12 @@ exports.getMatiereNotes = async function (req, res, next) {
         res.status(403).send("Unauthorized access.");
     }
 
+};
+
+exports.newNote = async function (req, res, next) {
+    if (await session.controlSession(req.cookies.session) === 2) {
+        await profModels.newNote(req.body.note, req.body.name, req.body.classe, req.body.matiere, res);
+    } else {
+    res.status(403).send("Unauthorized access.");
 }
+};
